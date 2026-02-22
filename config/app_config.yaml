@@ -1,0 +1,19 @@
+model:
+  name: llama3.2:3b
+  timeout: 60
+  max_retries: 3
+  temperature: 0.1
+
+rules:
+  dockerfile: config/rules.yaml
+  strict_mode: false
+
+output:
+  add_comments: true
+  add_explanations: true
+  format: detailed
+
+logging:
+  level: INFO
+  file: logs/app.log
+  audit_file: logs/audit.log

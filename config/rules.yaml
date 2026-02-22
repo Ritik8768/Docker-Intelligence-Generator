@@ -1,0 +1,56 @@
+rules:
+  - id: SEC-001
+    name: Non-root user required
+    severity: ERROR
+    description: Container must run as non-root user
+    
+  - id: SEC-002
+    name: Minimal base image
+    severity: ERROR
+    description: Use alpine or distroless base images
+    
+  - id: SEC-003
+    name: Explicit port exposure
+    severity: ERROR
+    description: Only expose necessary ports explicitly
+    
+  - id: SEC-004
+    name: No hardcoded secrets
+    severity: ERROR
+    description: No passwords, keys, or tokens in Dockerfile
+    
+  - id: SEC-005
+    name: Multi-stage build
+    severity: WARNING
+    description: Use multi-stage builds for optimization
+    
+  - id: SEC-006
+    name: Healthcheck required
+    severity: WARNING
+    description: Include HEALTHCHECK for web applications
+
+compose_rules:
+  - id: COMP-001
+    name: Resource limits required
+    severity: ERROR
+    description: All services must have CPU/memory limits
+    
+  - id: COMP-002
+    name: Network isolation
+    severity: WARNING
+    description: Services should use custom networks
+    
+  - id: COMP-003
+    name: No privileged mode
+    severity: ERROR
+    description: Containers must not run in privileged mode
+    
+  - id: COMP-004
+    name: Environment file usage
+    severity: WARNING
+    description: Use env_file instead of hardcoded environment
+    
+  - id: COMP-005
+    name: Health checks defined
+    severity: WARNING
+    description: Services should have healthcheck configuration

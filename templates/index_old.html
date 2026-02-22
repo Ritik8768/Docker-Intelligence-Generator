@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Intelligence Generator</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #1c2128;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #2f81f7;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-yellow: #d29922;
+            --hover-bg: #21262d;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.4s ease;
+        }
+        
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo { font-size: 32px; }
+        
+        .header-content p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .card-icon {
+            font-size: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+        }
+        
+        textarea::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            flex: 1;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #1f6feb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(47, 129, 247, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .output-section {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .output-section.show {
+            display: grid;
+        }
+        
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            background: var(--bg-primary);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .code-header span {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        
+        .copy-btn {
+            padding: 4px 12px;
+            font-size: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        
+        pre {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        
+        .validation-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .validation-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border-left: 3px solid;
+            background: var(--bg-tertiary);
+            transition: all 0.2s;
+        }
+        
+        .validation-item:hover {
+            background: var(--hover-bg);
+        }
+        
+        .validation-item.pass {
+            border-left-color: var(--accent-green);
+        }
+        
+        .validation-item.fail {
+            border-left-color: var(--accent-red);
+        }
+        
+        .validation-item.warning {
+            border-left-color: var(--accent-yellow);
+        }
+        
+        .validation-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .validation-content {
+            flex: 1;
+        }
+        
+        .validation-content strong {
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        
+        .validation-content span {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        .meta-info {
+            display: flex;
+            gap: 16px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        
+        .meta-label {
+            color: var(--text-secondary);
+        }
+        
+        .meta-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 48px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .error {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .error.show {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: shake 0.4s ease;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .header { flex-direction: column; gap: 16px; text-align: center; }
+            .button-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1><span class="logo">🐳</span>Docker Intelligence Generator</h1>
+                <p>Enterprise-grade AI-powered Dockerfile generation with security validation</p>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>System Ready</span>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📝</span>
+                    <h2>Application Description</h2>
+                </div>
+                
+                <label for="prompt">Describe your application stack and requirements</label>
+                <textarea 
+                    id="prompt" 
+                    rows="5" 
+                    placeholder="Example: Python Flask REST API with PostgreSQL database, Redis cache, and Nginx reverse proxy. Needs multi-stage build for production optimization."
+                ></textarea>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateDockerfile()" id="generateBtn">
+                        <span>⚡</span>
+                        <span>Generate Dockerfile</span>
+                    </button>
+                    <button class="btn-secondary" onclick="clearAll()">
+                        <span>🔄</span>
+                        <span>Clear</span>
+                    </button>
+                </div>
+                
+                <div class="error" id="error">
+                    <span>⚠️</span>
+                    <span id="errorText"></span>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Generating optimized Dockerfile... This may take 10-60 seconds</p>
+                </div>
+            </div>
+            
+            <div class="output-section" id="output">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📄</span>
+                        <h2>Generated Dockerfile</h2>
+                    </div>
+                    
+                    <div class="meta-info" id="metaInfo"></div>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Dockerfile</span>
+                            <button class="copy-btn" onclick="copyDockerfile()">📋 Copy</button>
+                        </div>
+                        <pre id="dockerfile"></pre>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🔒</span>
+                        <h2>Security & Best Practices Validation</h2>
+                    </div>
+                    
+                    <div id="validationSummary"></div>
+                    <div class="validation-grid" id="validation"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function generateDockerfile() {
+            const prompt = document.getElementById('prompt').value.trim();
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (!prompt) {
+                showError('Please enter a description of your application');
+                return;
+            }
+            
+            hideError();
+            showLoading();
+            hideOutput();
+            generateBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Generation failed');
+                }
+                
+                displayResults(data);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+                generateBtn.disabled = false;
+            }
+        }
+        
+        function displayResults(data) {
+            document.getElementById('dockerfile').textContent = data.dockerfile;
+            
+            const metaInfo = document.getElementById('metaInfo');
+            metaInfo.innerHTML = `
+                <div class="meta-item">
+                    <span class="meta-label">Stack:</span>
+                    <span class="meta-value">${data.stack}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Generated:</span>
+                    <span class="meta-value">${new Date().toLocaleString()}</span>
+                </div>
+            `;
+            
+            const validationSummary = document.getElementById('validationSummary');
+            const passCount = data.validation.results.filter(r => r.passed).length;
+            const totalCount = data.validation.results.length;
+            const score = Math.round((passCount / totalCount) * 100);
+            
+            validationSummary.innerHTML = `
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <span class="meta-label">Security Score:</span>
+                        <span class="meta-value">${score}%</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Checks Passed:</span>
+                        <span class="meta-value">${passCount}/${totalCount}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Summary:</span>
+                        <span class="meta-value">${data.validation.summary}</span>
+                    </div>
+                </div>
+            `;
+            
+            const validationDiv = document.getElementById('validation');
+            validationDiv.innerHTML = data.validation.results.map(result => {
+                const className = result.passed ? 'pass' : (result.severity === 'WARNING' ? 'warning' : 'fail');
+                const icon = result.passed ? '✅' : (result.severity === 'WARNING' ? '⚠️' : '❌');
+                return `
+                    <div class="validation-item ${className}">
+                        <span class="validation-icon">${icon}</span>
+                        <div class="validation-content">
+                            <strong>${result.rule_id}</strong><br>
+                            <span>${result.message}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            showOutput();
+        }
+        
+        function copyDockerfile() {
+            const dockerfile = document.getElementById('dockerfile').textContent;
+            navigator.clipboard.writeText(dockerfile).then(() => {
+                const btn = event.target.closest('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Copied';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+        
+        function clearAll() {
+            document.getElementById('prompt').value = '';
+            hideOutput();
+            hideError();
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+        
+        function showOutput() {
+            document.getElementById('output').classList.add('show');
+        }
+        
+        function hideOutput() {
+            document.getElementById('output').classList.remove('show');
+        }
+        
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('error').classList.add('show');
+        }
+        
+        function hideError() {
+            document.getElementById('error').classList.remove('show');
+        }
+        
+        document.getElementById('prompt').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateDockerfile();
+            }
+        });
+    </script>
+</body>
+</html>
