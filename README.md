@@ -96,7 +96,3 @@ Edit `config/app_config.yaml` to customize:
 
 Documentation: See `/Documention/` folder  
 Issues: Contact project team
-
-## License
-
-Internal Enterprise Tool
