@@ -48,7 +48,7 @@ Docker Intelligence Generator/
 └── docker-compose.yml     # Orchestration
 ```
 
-## Management
+## Management Commands 
 
 ### Start
 ```bash
