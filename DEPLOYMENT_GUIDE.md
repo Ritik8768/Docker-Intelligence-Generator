@@ -86,7 +86,7 @@ pip install -r requirements.txt
 python web_ui.py
 ```
 
-## 🔧 MANAGEMENT COMMANDS
+## 🔧 MANAGEMENT COMMAND
 
 ### Start Application
 ```bash
