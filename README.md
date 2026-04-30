@@ -92,7 +92,3 @@ Edit `config/app_config.yaml` to customize:
 - 1GB RAM minimum
 - Ollama (for AI generation)
 
-## Support
-
-Documentation: See `/Documention/` folder  
-Issues: Contact project team
